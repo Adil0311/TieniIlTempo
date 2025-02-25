@@ -13,12 +13,18 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.uniupo.TieniITempo.R
 import com.uniupo.TieniITempo.databinding.ActivityUserActivityDetailBinding
 import com.uniupo.TieniITempo.databinding.DialogCompleteSubActivityBinding
 import com.uniupo.tieniiltempo.data.model.SubActivity
 import com.uniupo.tieniiltempo.ui.chat.ChatActivity
+import com.uniupo.tieniiltempo.worker.ActivityTimerWorker
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class UserActivityDetailActivity : AppCompatActivity() {
 
@@ -185,5 +191,28 @@ class UserActivityDetailActivity : AppCompatActivity() {
             dialogBinding.ivPreview.visibility = View.VISIBLE
             dialogBinding.ivPreview.setImageURI(selectedImageUri)
         }
+    }
+
+    private fun scheduleTimerNotification(subActivity: SubActivity) {
+        if (subActivity.maxTime == null || subActivity.maxTime <= 0) {
+            return
+        }
+
+        val data = workDataOf(
+            "ACTIVITY_ID" to subActivity.activityId,
+            "SUB_ACTIVITY_ID" to subActivity.id
+        )
+
+        val timerWork = OneTimeWorkRequestBuilder<ActivityTimerWorker>()
+            .setInputData(data)
+            .setInitialDelay(subActivity.maxTime, TimeUnit.SECONDS)
+            .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniqueWork(
+                "timer_${subActivity.id}",
+                ExistingWorkPolicy.REPLACE,
+                timerWork
+            )
     }
 }
