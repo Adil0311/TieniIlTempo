@@ -30,4 +30,23 @@ class UserRepository @Inject constructor(
             false
         }
     }
+    suspend fun updateUserFcmToken(userId: String, token: String): Boolean {
+        return try {
+            firestore.collection("users").document(userId)
+                .update("fcmToken", token).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun getUsersByRole(role: String): List<User> {
+        return try {
+            firestore.collection("users")
+                .whereEqualTo("role", role)
+                .get().await().toObjects(User::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 }

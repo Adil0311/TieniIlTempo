@@ -53,6 +53,12 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
+    fun getCurrentUser() {
+        viewModelScope.launch {
+            userRepository.getUserById(auth.currentUser?.uid ?: "")
+        }
+    }
 }
 
 sealed class AuthState {
