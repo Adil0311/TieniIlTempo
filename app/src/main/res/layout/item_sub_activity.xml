@@ -1,0 +1,76 @@
+<!-- item_sub_activity.xml -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvSubActivityTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Titolo sotto-attività"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/btnDeleteSubActivity"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSubActivityDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Descrizione sotto-attività"
+            app:layout_constraintEnd_toStartOf="@+id/btnDeleteSubActivity"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSubActivityTitle" />
+
+        <TextView
+            android:id="@+id/tvMaxTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tempo max: 300 sec"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSubActivityDescription" />
+
+        <ImageView
+            android:id="@+id/ivLocationRequired"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_location"
+            app:layout_constraintBottom_toBottomOf="@+id/tvMaxTime"
+            app:layout_constraintStart_toEndOf="@+id/tvMaxTime"
+            app:layout_constraintTop_toTopOf="@+id/tvMaxTime" />
+
+        <ImageView
+            android:id="@+id/ivParallel"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_parallel"
+            app:layout_constraintBottom_toBottomOf="@+id/ivLocationRequired"
+            app:layout_constraintStart_toEndOf="@+id/ivLocationRequired"
+            app:layout_constraintTop_toTopOf="@+id/ivLocationRequired" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteSubActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

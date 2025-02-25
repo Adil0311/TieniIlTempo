@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "807703187001",
+    "project_id": "tieniiltempo-e0f1e",
+    "storage_bucket": "tieniiltempo-e0f1e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807703187001:android:c8ec4dfe8b479bc4a987e8",
+        "android_client_info": {
+          "package_name": "com.uniupo.TieniITempo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhgzzDlXG8EHEMwQXq_KLoVoqaYb17bvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
