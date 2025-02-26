@@ -28,6 +28,10 @@ class UserHomeActivity : AppCompatActivity() {
                     loadActivitiesFragment()
                     true
                 }
+                R.id.menu_dashboard -> {
+                    loadDashboardFragment()
+                    true
+                }
                 R.id.menu_chats -> {
                     loadChatsFragment()
                     true
@@ -42,6 +46,12 @@ class UserHomeActivity : AppCompatActivity() {
 
         // Default to activities view
         loadActivitiesFragment()
+    }
+
+    private fun loadDashboardFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, DashboardFragment())
+            .commit()
     }
 
     private fun loadActivitiesFragment() {

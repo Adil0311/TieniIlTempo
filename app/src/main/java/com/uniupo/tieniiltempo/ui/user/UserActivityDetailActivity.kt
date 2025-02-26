@@ -1,5 +1,6 @@
 package com.uniupo.tieniiltempo.ui.user
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -22,6 +23,7 @@ import com.uniupo.TieniITempo.databinding.ActivityUserActivityDetailBinding
 import com.uniupo.TieniITempo.databinding.DialogCompleteSubActivityBinding
 import com.uniupo.tieniiltempo.data.model.SubActivity
 import com.uniupo.tieniiltempo.ui.chat.ChatActivity
+import com.uniupo.tieniiltempo.utils.LocationHelper
 import com.uniupo.tieniiltempo.worker.ActivityTimerWorker
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -37,6 +39,26 @@ class UserActivityDetailActivity : AppCompatActivity() {
     private var activityId: String = ""
     private var selectedSubActivity: SubActivity? = null
     private var selectedImageUri: Uri? = null
+
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        if (locationGranted) {
+            // Permessi concessi, non serve fare nulla di specifico
+            // Le richieste di posizione avverranno quando necessario
+        } else {
+            // Permessi negati, mostra un messaggio
+            Toast.makeText(
+                this,
+                "Per completare le attività che richiedono la posizione, devi concedere i permessi",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
 
     private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -60,12 +82,22 @@ class UserActivityDetailActivity : AppCompatActivity() {
             return
         }
 
+        requestLocationPermissions()
         setupToolbar()
         setupRecyclerView()
         setupListeners()
         observeViewModel()
 
         viewModel.loadActivityDetails(activityId)
+    }
+
+    private fun requestLocationPermissions() {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     private fun setupToolbar() {
@@ -151,7 +183,51 @@ class UserActivityDetailActivity : AppCompatActivity() {
         }
     }
 
+
     private fun showCompleteSubActivityDialog(subActivity: SubActivity) {
+        // Se l'attività richiede la posizione, verifica prima la posizione
+        if (subActivity.requireLocation && subActivity.latitude != null && subActivity.longitude != null) {
+            val locationHelper = LocationHelper(this)
+
+            lifecycleScope.launch {
+                val currentLocation = locationHelper.getCurrentLocation()
+
+                if (currentLocation != null) {
+                    val isInRange = locationHelper.isLocationWithinRange(
+                        currentLocation.latitude,
+                        currentLocation.longitude,
+                        subActivity.latitude,
+                        subActivity.longitude
+                    )
+
+                    if (isInRange) {
+                        // Posizione corretta, mostra il dialog
+                        showCompletionDialog(subActivity)
+                    } else {
+                        // Non sei nella posizione richiesta
+                        Toast.makeText(
+                            this@UserActivityDetailActivity,
+                            "Non sei nel luogo richiesto per questa attività",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    // Non è stato possibile ottenere la posizione
+                    Toast.makeText(
+                        this@UserActivityDetailActivity,
+                        "Impossibile ottenere la tua posizione attuale",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        } else {
+            // L'attività non richiede la posizione, procedi normalmente
+            showCompletionDialog(subActivity)
+        }
+    }
+
+    // Aggiungi questo nuovo metodo con l'implementazione originale
+    private fun showCompletionDialog(subActivity: SubActivity) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_complete_sub_activity, null)
         dialogBinding = DialogCompleteSubActivityBinding.bind(dialogView)
 

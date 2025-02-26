@@ -87,5 +87,14 @@ class ActivityRepository @Inject constructor(
         }
     }
 
+    suspend fun getSubActivityById(subActivityId: String): SubActivity? {
+        return try {
+            firestore.collection("subActivities").document(subActivityId)
+                .get().await().toObject(SubActivity::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 
 }
