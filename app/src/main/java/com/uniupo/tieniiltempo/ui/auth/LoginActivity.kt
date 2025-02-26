@@ -74,18 +74,23 @@ class LoginActivity : AppCompatActivity() {
 
     private fun checkUserRoleAndNavigate() {
         lifecycleScope.launch {
-            val user = viewModel.getCurrentUser()
-            when (user?.role) {
-                "caregiver" -> {
-                    startActivity(Intent(this@LoginActivity, CaregiverHomeActivity::class.java))
-                    finish()
-                }
-                "user" -> {
-                    startActivity(Intent(this@LoginActivity, UserHomeActivity::class.java))
-                    finish()
-                }
-                else -> {
-                    Toast.makeText(this@LoginActivity, "Ruolo utente non valido", Toast.LENGTH_SHORT).show()
+            val firebaseUser = viewModel.getFirebaseUser() // Ottieni il FirebaseUser
+            if (firebaseUser != null) {
+                // Ottieni l'utente completo dal repository usando l'uid di Firebase
+                val userDetails = viewModel.getUserDetails(firebaseUser.uid)
+
+                when (userDetails?.role) {
+                    "caregiver" -> {
+                        startActivity(Intent(this@LoginActivity, CaregiverHomeActivity::class.java))
+                        finish()
+                    }
+                    "user" -> {
+                        startActivity(Intent(this@LoginActivity, UserHomeActivity::class.java))
+                        finish()
+                    }
+                    else -> {
+                        Toast.makeText(this@LoginActivity, "Ruolo utente non valido", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

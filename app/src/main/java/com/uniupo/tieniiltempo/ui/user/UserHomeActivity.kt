@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.uniupo.TieniITempo.R
 import com.uniupo.TieniITempo.databinding.ActivityUserHomeBinding
+import com.uniupo.tieniiltempo.ui.common.ChatsFragment
 
 class UserHomeActivity : AppCompatActivity() {
 

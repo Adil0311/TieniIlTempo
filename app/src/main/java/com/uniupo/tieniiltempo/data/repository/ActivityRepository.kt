@@ -7,7 +7,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class ActivityRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val notificationRepository: NotificationRepository
 ) {
     suspend fun createActivity(activity: Activity): String? {
         return try {
@@ -15,7 +16,6 @@ class ActivityRepository @Inject constructor(
             val activityWithId = activity.copy(id = docRef.id)
             docRef.set(activityWithId).await()
 
-            // Invia notifica
             notificationRepository.sendActivityNotification(activityWithId.id)
 
             activityWithId.id

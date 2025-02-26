@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 class ChatRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val notificationRepository: NotificationRepository
 ) {
 
     fun getMessagesForActivity(activityId: String): Flow<List<Message>> {
@@ -75,6 +76,37 @@ class ChatRepository @Inject constructor(
             }
         } catch (e: Exception) {
             // Handle exception
+        }
+    }
+
+    suspend fun getLastMessageForActivity(activityId: String): Message? {
+        return try {
+            val messages = firestore.collection("messages")
+                .whereEqualTo("activityId", activityId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+                .toObjects(Message::class.java)
+
+            if (messages.isNotEmpty()) messages[0] else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun hasUnreadMessages(activityId: String, userId: String): Boolean {
+        return try {
+            val unreadMessages = firestore.collection("messages")
+                .whereEqualTo("activityId", activityId)
+                .whereNotEqualTo("senderId", userId)
+                .whereEqualTo("isRead", false)
+                .get()
+                .await()
+
+            !unreadMessages.isEmpty
+        } catch (e: Exception) {
+            false
         }
     }
 }

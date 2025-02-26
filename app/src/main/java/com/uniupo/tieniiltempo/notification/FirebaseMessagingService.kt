@@ -1,12 +1,15 @@
 package com.uniupo.tieniiltempo.notification
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -15,6 +18,9 @@ import com.uniupo.TieniITempo.R
 import com.uniupo.tieniiltempo.MainActivity
 import com.uniupo.tieniiltempo.data.repository.UserRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,11 +56,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Invia il nuovo token al server
-        updateUserFcmToken(token)
+        CoroutineScope(Dispatchers.IO).launch {
+            updateUserFcmToken(token)
+        }
     }
 
-    private fun updateUserFcmToken(token: String) {
+    private suspend fun updateUserFcmToken(token: String) {
         val currentUser = userRepository.getCurrentUser() ?: return
         userRepository.updateUserFcmToken(currentUser.uid, token)
     }
@@ -122,14 +129,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         // Controlla il permesso per le notifiche
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permissionGranted = notificationManager.areNotificationsEnabled()
-            if (!permissionGranted) {
-                // In una situazione reale potresti voler richiedere il permesso
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Non abbiamo i permessi, non mostrare notifiche
                 return
             }
         }
 
-        notificationManager.notify(getNotificationId(), notificationBuilder.build())
+        try {
+            notificationManager.notify(getNotificationId(), notificationBuilder.build())
+        } catch (e: SecurityException) {
+            // Gestisce esplicitamente l'eccezione di sicurezza
+            Log.e("FirebaseMessagingService", "SecurityException: ${e.message}")
+        }
     }
 
     private fun getNotificationId(): Int {

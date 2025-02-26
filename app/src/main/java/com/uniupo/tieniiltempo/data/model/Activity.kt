@@ -1,5 +1,7 @@
 package com.uniupo.tieniiltempo.data.model
 
+import java.util.Date
+
 data class Activity(
     val id: String = "",
     val title: String = "",

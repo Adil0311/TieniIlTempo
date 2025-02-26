@@ -1,11 +1,13 @@
 package com.uniupo.tieniiltempo.ui.user
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.storage.FirebaseStorage
 import com.uniupo.tieniiltempo.data.model.Activity
 import com.uniupo.tieniiltempo.data.model.SubActivity
+import com.uniupo.tieniiltempo.data.model.User
 import com.uniupo.tieniiltempo.data.model.UserAchievement
 import com.uniupo.tieniiltempo.data.repository.AchievementRepository
 import com.uniupo.tieniiltempo.data.repository.ActivityRepository
@@ -45,6 +47,9 @@ class UserViewModel @Inject constructor(
 
     private val _weeklyProgress = MutableStateFlow<Map<String, Int>>(emptyMap())
     val weeklyProgress: StateFlow<Map<String, Int>> = _weeklyProgress
+
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser
 
     fun loadUserActivities() {
         viewModelScope.launch {
@@ -211,6 +216,19 @@ class UserViewModel @Inject constructor(
             // Crea la mappa day -> value
             val progressMap = days.zip(values).toMap()
             _weeklyProgress.value = progressMap
+        }
+    }
+
+    fun loadCurrentUser() {
+        viewModelScope.launch {
+            try {
+                val currentUserId = userRepository.getCurrentUser()?.uid ?: return@launch
+                val user = userRepository.getUserById(currentUserId)
+                _currentUser.value = user
+            } catch (e: Exception) {
+                // Gestione errori
+                Log.e("UserViewModel", "Error loading current user: ${e.message}")
+            }
         }
     }
 }

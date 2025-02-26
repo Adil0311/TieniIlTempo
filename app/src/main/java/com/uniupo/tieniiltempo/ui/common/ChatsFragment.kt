@@ -1,4 +1,4 @@
-package com.uniupo.tieniiltempo.ui.caregiver
+package com.uniupo.tieniiltempo.ui.common
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,30 +6,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.uniupo.TieniITempo.databinding.FragmentCaregiverActivitiesBinding
+import com.uniupo.TieniITempo.R
+import com.uniupo.TieniITempo.databinding.FragmentChatsBinding
+import com.uniupo.tieniiltempo.data.model.ChatPreview
+import com.uniupo.tieniiltempo.ui.chat.ChatActivity
 import kotlinx.coroutines.launch
 
-// CaregiverActivitiesFragment.kt
-class CaregiverActivitiesFragment : Fragment() {
+class ChatsFragment : Fragment() {
 
-    private var _binding: FragmentCaregiverActivitiesBinding? = null
+    private var _binding: FragmentChatsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: CaregiverViewModel by activityViewModels()
-    private lateinit var activitiesAdapter: ActivitiesAdapter
+    private val viewModel: ChatsViewModel by viewModels()
+    private lateinit var chatsAdapter: ChatsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCaregiverActivitiesBinding.inflate(inflater, container, false)
+        _binding = FragmentChatsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -39,19 +41,18 @@ class CaregiverActivitiesFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
 
-        viewModel.loadActivities()
+        viewModel.loadChats()
     }
 
     private fun setupRecyclerView() {
-        activitiesAdapter = ActivitiesAdapter { activity ->
-            // Handle click on activity
-            val intent = Intent(requireContext(), ActivityDetailActivity::class.java)
-            intent.putExtra("ACTIVITY_ID", activity.id)
+        chatsAdapter = ChatsAdapter { chatPreview ->
+            val intent = Intent(requireContext(), ChatActivity::class.java)
+            intent.putExtra("ACTIVITY_ID", chatPreview.activityId)
             startActivity(intent)
         }
 
-        binding.rvActivities.apply {
-            adapter = activitiesAdapter
+        binding.rvChats.apply {
+            adapter = chatsAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         }
@@ -60,14 +61,16 @@ class CaregiverActivitiesFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.activities.collect { activities ->
-                    if (activities.isEmpty()) {
+                viewModel.chats.collect { chats ->
+                    binding.progressBar.visibility = View.GONE
+
+                    if (chats.isEmpty()) {
                         binding.tvEmptyState.visibility = View.VISIBLE
-                        binding.rvActivities.visibility = View.GONE
+                        binding.rvChats.visibility = View.GONE
                     } else {
                         binding.tvEmptyState.visibility = View.GONE
-                        binding.rvActivities.visibility = View.VISIBLE
-                        activitiesAdapter.submitList(activities)
+                        binding.rvChats.visibility = View.VISIBLE
+                        chatsAdapter.submitList(chats)
                     }
                 }
             }

@@ -37,6 +37,11 @@
             android:name="com.uniupo.tieniiltempo.ui.user.UserActivityDetailActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.uniupo.tieniiltempo.ui.caregiver.ActivityDetailActivity"
+            android:exported="false" />
+
+
         <service
             android:name="com.uniupo.tieniiltempo.notification.FirebaseMessagingService"
             android:exported="false">

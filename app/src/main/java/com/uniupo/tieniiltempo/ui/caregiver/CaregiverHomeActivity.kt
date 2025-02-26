@@ -2,16 +2,16 @@ package com.uniupo.tieniiltempo.ui.caregiver
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.uniupo.TieniITempo.R
 import com.uniupo.TieniITempo.databinding.ActivityCaregiverHomeBinding
+import com.uniupo.tieniiltempo.ui.common.ChatsFragment
+import com.uniupo.tieniiltempo.ui.user.ProfileFragment
 
 // CaregiverHomeActivity.kt
 class CaregiverHomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCaregiverHomeBinding
-    private val viewModel: CaregiverViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

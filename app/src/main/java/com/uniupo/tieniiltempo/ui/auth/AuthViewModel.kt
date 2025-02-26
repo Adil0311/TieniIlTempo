@@ -3,6 +3,7 @@ package com.uniupo.tieniiltempo.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.uniupo.tieniiltempo.data.model.User
 import com.uniupo.tieniiltempo.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,13 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUserById(auth.currentUser?.uid ?: "")
         }
+    }
+    suspend fun getUserDetails(userId: String): User? {
+        return userRepository.getUserById(userId)
+    }
+
+    fun getFirebaseUser(): FirebaseUser? {
+        return auth.currentUser
     }
 }
 
